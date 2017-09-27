@@ -1,0 +1,47 @@
+Spring AOP 自定义注解的实现：
+1.maven依赖：
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.7.0</version>
+    </dependency>
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib-nodep</artifactId>
+      <version>2.2.2</version>
+    </dependency>
+
+2.在spring-***.xml中加入spring支持，打开aop功能：
+<aop:aspectj-autoproxy proxy-target-class="true"/>
+<context:component-scan base-package="com.joyous.distribution" />
+<context:annotation-config />
+
+
+3.编写自定义注解。实现对方法所实现的功能进行描述，以便在通知中获取描述信息
+/*
+ * 校验签名合法性 自定义事务
+ */
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+public @interface SecureValid {
+    String desc() default "身份和安全验证开始...";
+}
+@Target 用于描述注解的使用范围（即：被描述的注解可以用在什么地方），其取值有：
+METHOD 用于描述方法。
+PARAMETER 用于描述参数。
+@Retention 用于描述注解的生命周期（即：被描述的注解在什么范围内有效），其取值有：
+RUNTIME在运行时有效（即运行时保留）。
+
+@Documented 在默认的情况下javadoc命令不会将我们的annotation生成再doc中去的，所以使用该标记就是告诉jdk让它也将annotation生成到doc中去
+
+@Inherited 比如有一个类A，在他上面有一个标记annotation，那么A的子类B是否不用再次标记annotation就可以继承得到呢，答案是肯定的
+
+
+4。编写操作日志切面通知实现类
